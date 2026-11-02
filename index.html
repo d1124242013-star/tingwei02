@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>李庭緯 BMI 健康計算與運動建議網頁</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font (Inter & Noto Sans TC) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f3fdf6;
+        }
+
+        /* Float animation for background veggies & fruits */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(4deg); }
+        }
+        @keyframes float-reverse {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(12px) rotate(-4deg); }
+        }
+        .animate-float-slow {
+            animation: float 7s ease-in-out infinite;
+        }
+        .animate-float-reverse {
+            animation: float-reverse 8s ease-in-out infinite;
+        }
+
+        /* Glassmorphism Styling */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        /* Custom Range Slider */
+        input[type=range] {
+            accent-color: #10b981;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden text-gray-800 pb-12">
+
+    <!-- Background Decorative Fruits & Vegetables SVGs -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-35">
+        <!-- Broccoli Top Left -->
+        <svg class="absolute top-8 left-6 w-20 h-20 md:w-32 md:h-32 animate-float-slow" viewBox="0 0 100 100">
+            <path d="M50,45 C35,45 25,35 30,20 C35,5 55,5 60,18 C68,8 85,15 82,30 C90,40 80,55 65,52 C65,52 65,75 60,85 C55,90 45,90 40,85 C35,75 35,52 35,52 C20,55 10,40 18,30 C15,15 32,8 40,18 C45,10 50,45 50,45 Z" fill="#22c55e" />
+            <path d="M42,50 L42,75 M50,48 L50,80 M58,50 L58,75" stroke="#15803d" stroke-width="4" stroke-linecap="round" />
+            <circle cx="40" cy="25" r="3" fill="#86efac"/>
+            <circle cx="60" cy="28" r="4" fill="#86efac"/>
+            <circle cx="50" cy="18" r="3" fill="#86efac"/>
+        </svg>
+
+        <!-- Carrot Top Right -->
+        <svg class="absolute top-12 right-8 w-20 h-20 md:w-32 md:h-32 animate-float-reverse" viewBox="0 0 100 100">
+            <path d="M75,20 L55,10 C55,10 58,2 48,12 C42,2 45,15 45,15 L35,25 Z" fill="#16a34a" />
+            <path d="M40,20 Q80,60 20,90 Q10,50 40,20 Z" fill="#f97316" />
+            <path d="M35,38 Q45,42 40,48 M30,52 Q40,56 35,62 M25,68 Q35,72 30,78" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" />
+        </svg>
+
+        <!-- Apple Bottom Left -->
+        <svg class="absolute bottom-16 left-10 w-24 h-24 md:w-36 md:h-36 animate-float-reverse" viewBox="0 0 100 100">
+            <path d="M50,30 Q50,15 58,12 C62,10 60,20 50,30 Z" fill="#15803d" />
+            <path d="M50,32 C40,25 20,25 15,45 C10,65 25,85 45,88 C50,89 50,85 55,88 C75,85 90,65 85,45 C80,25 60,25 50,32 Z" fill="#ef4444" />
+            <path d="M30,40 Q25,50 32,65" stroke="#fca5a5" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.6"/>
+        </svg>
+
+        <!-- Banana Bottom Right -->
+        <svg class="absolute bottom-20 right-12 w-24 h-24 md:w-36 md:h-36 animate-float-slow" viewBox="0 0 100 100">
+            <path d="M20,20 Q60,10 80,50 Q90,75 60,85 Q40,90 25,75 Q45,75 65,55 Q60,30 20,20 Z" fill="#eab308" />
+            <path d="M20,20 L15,15 M80,50 L88,52" stroke="#ca8a04" stroke-width="4" stroke-linecap="round" />
+        </svg>
+
+        <!-- Avocado Center Left -->
+        <svg class="absolute top-1/2 left-4 w-16 h-16 md:w-28 md:h-28 animate-float-slow" viewBox="0 0 100 100">
+            <path d="M50,15 C30,15 20,40 20,65 C20,82 33,90 50,90 C67,90 80,82 80,65 C80,40 70,15 50,15 Z" fill="#15803d" />
+            <path d="M50,22 C35,22 27,43 27,64 C27,78 37,84 50,84 C63,84 73,78 73,64 C73,43 65,22 50,22 Z" fill="#bbf7d0" />
+            <circle cx="50" cy="65" r="14" fill="#78350f" />
+        </svg>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="relative z-10 max-w-4xl mx-auto px-4 pt-8 md:pt-12">
+        
+        <!-- Header Banner -->
+        <header class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-100/90 text-emerald-800 text-sm font-semibold mb-3 shadow-sm">
+                <i class="fa-solid fa-seedling text-emerald-600"></i> 健康生活 ‧ 從掌握 BMI 開始
+            </div>
+            <h1 class="text-3xl md:text-5xl font-black text-gray-800 tracking-tight">
+                李庭緯 <span class="text-emerald-600">BMI</span> 計算網頁
+            </h1>
+            <p class="text-gray-600 text-sm md:text-base mt-2 max-w-md mx-auto">
+                輕鬆試算身體質量指數，獲取量身打造的均衡飲食與減重運動推薦！
+            </p>
+        </header>
+
+        <!-- Calculator Card -->
+        <div class="glass-card rounded-3xl p-6 md:p-10 shadow-xl border border-white/60">
+            
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                
+                <!-- Inputs Section (Left Column) -->
+                <div class="md:col-span-7 space-y-6">
+                    
+                    <!-- Height Input Group -->
+                    <div class="bg-white/80 p-5 rounded-2xl border border-emerald-100 shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <label for="height" class="font-bold text-gray-700 flex items-center gap-2">
+                                <i class="fa-solid fa-ruler-vertical text-emerald-500"></i> 身高 (Height)
+                            </label>
+                            <span id="heightValue" class="text-emerald-600 font-extrabold text-lg">170 <span class="text-xs font-normal text-gray-500">公分</span></span>
+                        </div>
+                        <input type="number" id="height" value="170" min="100" max="230" 
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 mb-3">
+                        <input type="range" id="heightRange" value="170" min="100" max="230" class="w-full h-2 bg-emerald-100 rounded-lg cursor-pointer">
+                    </div>
+
+                    <!-- Weight Input Group -->
+                    <div class="bg-white/80 p-5 rounded-2xl border border-emerald-100 shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <label for="weight" class="font-bold text-gray-700 flex items-center gap-2">
+                                <i class="fa-solid fa-weight-scale text-emerald-500"></i> 體重 (Weight)
+                            </label>
+                            <span id="weightValue" class="text-emerald-600 font-extrabold text-lg">65 <span class="text-xs font-normal text-gray-500">公斤</span></span>
+                        </div>
+                        <input type="number" id="weight" value="65" min="30" max="200" 
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 mb-3">
+                        <input type="range" id="weightRange" value="65" min="30" max="200" class="w-full h-2 bg-emerald-100 rounded-lg cursor-pointer">
+                    </div>
+
+                    <button onclick="resetForm()" class="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold rounded-xl transition duration-200 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i> 重置數值
+                    </button>
+
+                </div>
+
+                <!-- Result Display Section (Right Column) -->
+                <div class="md:col-span-5 flex flex-col items-center justify-center text-center border-t md:border-t-0 md:border-l border-emerald-100 pt-6 md:pt-0 md:pl-8">
+                    
+                    <div class="text-xs font-bold text-emerald-800 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full mb-2">
+                        您的計算結果
+                    </div>
+
+                    <!-- Main BMI Number -->
+                    <div class="my-3">
+                        <span id="bmiDisplay" class="text-6xl font-black tracking-tight text-emerald-600">22.5</span>
+                        <span class="text-gray-400 font-bold block text-sm mt-1">BMI 指數</span>
+                    </div>
+
+                    <!-- Category Badge -->
+                    <div id="statusBadge" class="inline-block px-4 py-1.5 rounded-full text-sm font-bold text-white shadow-sm bg-emerald-500 mb-6">
+                        體重正常 (Ideal)
+                    </div>
+
+                    <!-- Visual Spectrum Bar -->
+                    <div class="w-full mb-6">
+                        <div class="flex justify-between text-[10px] text-gray-400 mb-1 font-semibold">
+                            <span>過輕</span>
+                            <span>正常</span>
+                            <span>過重</span>
+                            <span>肥胖</span>
+                        </div>
+                        <div class="relative w-full h-3 bg-gray-200 rounded-full overflow-hidden flex">
+                            <div class="w-[25%] bg-sky-400"></div>
+                            <div class="w-[25%] bg-emerald-400"></div>
+                            <div class="w-[15%] bg-amber-400"></div>
+                            <div class="w-[35%] bg-rose-400"></div>
+                        </div>
+                        <!-- Marker Needle -->
+                        <div class="relative w-full">
+                            <div id="bmiMarker" class="absolute -top-1.5 transition-all duration-300 transform -translate-x-1/2" style="left: 45%;">
+                                <div class="w-3 h-3 bg-gray-800 rotate-45 mx-auto"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Health Tip Box -->
+                    <div id="adviceBox" class="w-full p-4 rounded-2xl bg-emerald-50/80 border border-emerald-100 flex items-start gap-3 text-left shadow-sm">
+                        <div id="adviceIcon" class="text-emerald-500 text-xl mt-0.5">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div>
+                            <h4 id="adviceTitle" class="font-bold text-gray-800 text-sm">太棒了！請繼續保持！</h4>
+                            <p id="adviceText" class="text-xs text-gray-600 mt-1 leading-relaxed">
+                                您的體重處於理想範圍。建議保持均衡飲食，多攝取彩虹五蔬果，並搭配每週規律運動！
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Dynamic Diet & Exercise Recommendation Section -->
+        <section class="mt-8 glass-card rounded-3xl p-6 md:p-8 shadow-xl border-t-4 border-emerald-500">
+            <div class="flex items-center space-x-3 mb-6 border-b border-gray-100 pb-4">
+                <span class="bg-emerald-100 text-emerald-700 p-3 rounded-2xl">
+                    <i class="fa-solid fa-person-running text-2xl"></i>
+                </span>
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">個人化健康減重與運動建議</h3>
+                    <p class="text-xs text-gray-500">根據您目前的 BMI 體態，為您量身打造飲食與運動菜單</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Diet Management Card -->
+                <div class="bg-white/90 rounded-2xl p-5 border border-emerald-100 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 font-bold text-emerald-800 text-base mb-3">
+                            <i class="fa-solid fa-utensils text-emerald-600"></i>
+                            <span id="dietCardTitle">飲食減重與營養方針</span>
+                        </div>
+                        <ul id="dietAdviceList" class="space-y-2.5 text-xs md:text-sm text-gray-600 leading-relaxed">
+                            <!-- Injected dynamically via JavaScript -->
+                        </ul>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-gray-100 flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50 p-2.5 rounded-xl font-medium">
+                        <i class="fa-solid fa-tint text-sky-500"></i>
+                        <span>水分補充提示：每日飲水量建議達到「體重 (kg) × 35~40 c.c.」</span>
+                    </div>
+                </div>
+
+                <!-- Exercise Recommendation Card -->
+                <div class="bg-white/90 rounded-2xl p-5 border border-emerald-100 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 font-bold text-emerald-800 text-base mb-3">
+                            <i class="fa-solid fa-dumbbell text-emerald-600"></i>
+                            <span id="exerciseCardTitle">適合的運動推薦</span>
+                        </div>
+                        <div id="exerciseContent" class="space-y-3">
+                            <!-- Injected dynamically via JavaScript -->
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-gray-100 flex items-center gap-2 text-xs text-amber-800 bg-amber-50 p-2.5 rounded-xl font-medium">
+                        <i class="fa-solid fa-shield-heart text-amber-600"></i>
+                        <span>安全守則：運動前補水分與暖身，若有不適請立即休息調整強度。</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BMI Standards Reference Table -->
+        <section class="mt-8 glass-card rounded-3xl p-6 shadow-lg">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-table-list text-emerald-600"></i> 衛福部 BMI 體態標準對照表
+            </h3>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs md:text-sm font-medium">
+                <div class="p-3 bg-sky-50 border border-sky-100 rounded-xl">
+                    <span class="block text-sky-700 font-bold">體重過輕</span>
+                    <span class="text-gray-500">BMI &lt; 18.5</span>
+                </div>
+                <div class="p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
+                    <span class="block text-emerald-700 font-bold">正常範圍</span>
+                    <span class="text-gray-500">18.5 ≤ BMI &lt; 24</span>
+                </div>
+                <div class="p-3 bg-amber-50 border border-amber-100 rounded-xl">
+                    <span class="block text-amber-700 font-bold">體重過重</span>
+                    <span class="text-gray-500">24 ≤ BMI &lt; 27</span>
+                </div>
+                <div class="p-3 bg-rose-50 border border-rose-100 rounded-xl">
+                    <span class="block text-rose-700 font-bold">肥胖</span>
+                    <span class="text-gray-500">BMI ≥ 27</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const heightInput = document.getElementById('height');
+            const heightRange = document.getElementById('heightRange');
+            const heightValueDisplay = document.getElementById('heightValue');
+
+            const weightInput = document.getElementById('weight');
+            const weightRange = document.getElementById('weightRange');
+            const weightValueDisplay = document.getElementById('weightValue');
+
+            // Synchronize Range and Numeric inputs safely
+            function syncInputs(numInput, rangeInput, displayElement, unit) {
+                if (!numInput || !rangeInput || !displayElement) return;
+
+                numInput.addEventListener('input', (e) => {
+                    let val = e.target.value;
+                    rangeInput.value = val;
+                    displayElement.innerHTML = `${val} <span class="text-xs font-normal text-gray-500">${unit}</span>`;
+                    calculateBMI();
+                });
+
+                rangeInput.addEventListener('input', (e) => {
+                    let val = e.target.value;
+                    numInput.value = val;
+                    displayElement.innerHTML = `${val} <span class="text-xs font-normal text-gray-500">${unit}</span>`;
+                    calculateBMI();
+                });
+            }
+
+            if (heightInput && heightRange && heightValueDisplay) {
+                syncInputs(heightInput, heightRange, heightValueDisplay, '公分');
+            }
+            if (weightInput && weightRange && weightValueDisplay) {
+                syncInputs(weightInput, weightRange, weightValueDisplay, '公斤');
+            }
+
+            function calculateBMI() {
+                if (!heightInput || !weightInput) return;
+
+                const h = parseFloat(heightInput.value);
+                const w = parseFloat(weightInput.value);
+
+                if (!h || !w || h <= 0 || w <= 0) {
+                    return;
+                }
+
+                // BMI Formula: weight (kg) / (height (m))^2
+                const heightInMeters = h / 100;
+                const bmi = (w / (heightInMeters * heightInMeters)).toFixed(1);
+
+                // Display BMI
+                const bmiDisplay = document.getElementById('bmiDisplay');
+                if (bmiDisplay) bmiDisplay.innerText = bmi;
+
+                // Status and Recommendations
+                const statusBadge = document.getElementById('statusBadge');
+                const adviceTitle = document.getElementById('adviceTitle');
+                const adviceText = document.getElementById('adviceText');
+                const adviceIcon = document.getElementById('adviceIcon');
+                const bmiMarker = document.getElementById('bmiMarker');
+
+                // Dynamic Exercise & Diet recommendation elements
+                const dietCardTitle = document.getElementById('dietCardTitle');
+                const dietAdviceList = document.getElementById('dietAdviceList');
+                const exerciseCardTitle = document.getElementById('exerciseCardTitle');
+                const exerciseContent = document.getElementById('exerciseContent');
+
+                let category = '';
+                let colorClass = '';
+                let markerPercent = 0;
+
+                if (bmi < 18.5) {
+                    category = '體重過輕 (Underweight)';
+                    colorClass = 'bg-sky-500';
+                    if (adviceTitle) adviceTitle.innerText = '提醒：體重稍微過輕囉！';
+                    if (adviceText) adviceText.innerText = '建議適度增加優質蛋白質與原型碳水化合物，配合適度肌力訓練進行健康增肌！';
+                    if (adviceIcon) {
+                        adviceIcon.className = 'text-sky-500 text-xl mt-0.5';
+                        adviceIcon.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
+                    }
+                    markerPercent = Math.max(5, (bmi / 18.5) * 25);
+
+                    // Diet Advice (Underweight)
+                    if (dietCardTitle) dietCardTitle.innerText = '健康增肌與營養補給策略';
+                    if (dietAdviceList) {
+                        dietAdviceList.innerHTML = `
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span><strong>熱量微盈：</strong>每日攝取比維持體重所需多 300~500 大卡，促進肌肉合成。</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span><strong>優質蛋白質：</strong>每餐補足豆、魚、蛋、肉類，配合運動後 30 分鐘補充牛奶或豆漿。</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span><strong>少量多餐：</strong>除了三餐正餐外，可於午後及睡前補充堅果、地瓜或燕麥點心。</span></li>
+                        `;
+                    }
+
+                    // Exercise Advice (Underweight)
+                    if (exerciseCardTitle) exerciseCardTitle.innerText = '適合的增肌與體能訓練';
+                    if (exerciseContent) {
+                        exerciseContent.innerHTML = `
+                            <div class="p-3 bg-emerald-50/60 rounded-xl">
+                                <div class="font-bold text-gray-800 text-xs flex items-center gap-1.5 mb-1"><i class="fa-solid fa-dumbbell text-emerald-600"></i> 漸進式肌力訓練（每週 3~4 次）</div>
+                                <p class="text-xs text-gray-600">以徒手深蹲、伏地挺身、彈力帶或健身房器材進行中低次數、漸進負荷訓練，刺激肌肉成長。</p>
+                            </div>
+                            <div class="p-3 bg-sky-50/60 rounded-xl">
+                                <div class="font-bold text-gray-800 text-xs flex items-center gap-1.5 mb-1"><i class="fa-solid fa-person-walking text-sky-600"></i> 適度輕量有氧（每週 2 次，每次 20 分鐘）</div>
+                                <p class="text-xs text-gray-600">快走、散步或輕鬆騎單車，用以提升心肺功能與食慾，避免過度高強度消耗。</p>
+                            </div>
+                        `;
+                    }
+
+                } else if (bmi >= 18.5 && bmi < 24) {
+                    category = '體重正常 (Ideal)';
+                    colorClass = 'bg-emerald-500';
+                    if (adviceTitle) adviceTitle.innerText = '太棒了！請繼續保持！';
+                    if (adviceText) adviceText.innerText = '您的體重處於理想範圍。建議保持均衡飲食，多攝取彩虹五蔬果與充足水分，並維持每週規律運動！';
+                    if (adviceIcon) {
+                        adviceIcon.className = 'text-emerald-500 text-xl mt-0.5';
+                        adviceIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                    }
+                    markerPercent = 25 + ((bmi - 18.5) / (24 - 18.5)) * 25;
+
+                    // Diet Advice (Normal)
+                    if (dietCardTitle) dietCardTitle.innerText = '體態維持與彩虹飲食法';
+                    if (dietAdviceList) {
+                        dietAdviceList.innerHTML = `
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span><strong>黃金進食順序：</strong>用餐時先吃高纖蔬菜 ➔ 再吃蛋白質 ➔ 最後吃原型澱粉，穩定血糖。</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span><strong>五大彩虹蔬果：</strong>每日至少攝取 3 份蔬菜與 2 份水果，補充豐富植化素與抗氧化劑。</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span><strong>控糖與減油：</strong>減少精緻糖（手搖飲、甜點）與高飽和脂肪攝取，維持代謝靈敏。</span></li>
+                        `;
+                    }
+
+                    // Exercise Advice (Normal)
+                    if (exerciseCardTitle) exerciseCardTitle.innerText = '全面體能強化運動計畫';
+                    if (exerciseContent) {
+                        exerciseContent.innerHTML = `
+                            <div class="p-3 bg-emerald-50/60 rounded-xl">
+                                <div class="font-bold text-gray-800 text-xs flex items-center gap-1.5 mb-1"><i class="fa-solid fa-person-running text-emerald-600"></i> 中強度有氧運動（每週 150 分鐘）</div>
+                                <p class="text-xs text-gray-600">慢跑、游泳、路跑或羽球，分次完成（如每次 30 分鐘，每週 5 天），保持心血管健康。</p>
+                            </div>
+                            <div class="p-3 bg-teal-50/60 rounded-xl">
+                                <div class="font-bold text-gray-800 text-xs flex items-center gap-1.5 mb-1"><i class="fa-solid fa-child-reaching text-teal-600"></i> 全身阻力訓練（每週 2~3 次）</div>
+                                <p class="text-xs text-gray-600">包含核心訓練（棒式）、橋式與硬舉，維持基礎代謝率與優美曲線。</p>
+                            </div>
+                        `;
+                    }
+
+                } else if (bmi >= 24 && bmi < 27) {
+                    category = '體重過重 (Overweight)';
+                    colorClass = 'bg-amber-500';
+                    if (adviceTitle) adviceTitle.innerText = '注意：體重稍微過重囉！';
+                    if (adviceText) adviceText.innerText = '建議調整飲食結構，適度創造熱量赤字，搭配規律有氧與肌力訓練進行燃脂！';
+                    if (adviceIcon) {
+                        adviceIcon.className = 'text-amber-500 text-xl mt-0.5';
+                        adviceIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                    }
+                    markerPercent = 50 + ((bmi - 24) / (27 - 24)) * 15;
+
+                    // Diet Advice (Overweight)
+                    if (dietCardTitle) dietCardTitle.innerText = '減重飲食與熱量赤字管理';
+                    if (dietAdviceList) {
+                        dietAdviceList.innerHTML = `
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span><strong>建立熱量赤字：</strong>每日減少 300~500 大卡熱量攝取，溫和穩定減脂（每週約減 0.5kg）。</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span><strong>高纖低 GI 澱粉：</strong>用糙米、地瓜、燕麥取代白米飯與精緻麵食，延長飽足感。</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span><strong>戒除隱形熱量：</strong>嚴格避免含糖飲料、加工肉品與炸物，善用蒸、煮、烤等清淡烹調。</span></li>
+                        `;
+                    }
+
+                    // Exercise Advice (Overweight)
+                    if (exerciseCardTitle) exerciseCardTitle.innerText = '高效燃脂與動態運動組合';
+                    if (exerciseContent) {
+                        exerciseContent.innerHTML = `
+                            <div class="p-3 bg-amber-50/60 rounded-xl">
+                                <div class="font-bold text-gray-800 text-xs flex items-center gap-1.5 mb-1"><i class="fa-solid fa-bicycle text-amber-600"></i> 有氧燃脂運動（每週 150~200 分鐘）</div>
+                                <p class="text-xs text-gray-600">推薦快走、飛輪單車、滑步機或有氧舞蹈，每次 30~45 分鐘，達到心跳微喘能說話的強度。</p>
+                            </div>
+                            <div class="p-3 bg-emerald-50/60 rounded-xl">
+                                <div class="font-bold text-gray-800 text-xs flex items-center gap-1.5 mb-1"><i class="fa-solid fa-dumbbell text-emerald-600"></i> 基礎肌力訓練（每週 2~3 次）</div>
+                                <p class="text-xs text-gray-600">徒手深蹲、座姿推胸與划船訓練，增加肌肉量提升全天候基礎代謝率。</p>
+                            </div>
+                        `;
+                    }
+
+                } else {
+                    category = '體重肥胖 (Obese)';
+                    colorClass = 'bg-rose-500';
+                    if (adviceTitle) adviceTitle.innerText = '警訊：已達肥胖範圍！';
+                    if (adviceText) adviceText.innerText = '建議進行積極的飲食控管，並優先選擇關節保護型低衝擊運動，一步步降回健康指標！';
+                    if (adviceIcon) {
+                        adviceIcon.className = 'text-rose-500 text-xl mt-0.5';
+                        adviceIcon.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
+                    }
+                    markerPercent = Math.min(95, 65 + ((bmi - 27) / 13) * 35);
+
+                    // Diet Advice (Obese)
+                    if (dietCardTitle) dietCardTitle.innerText = '積極減重飲食控管計畫';
+                    if (dietAdviceList) {
+                        dietAdviceList.innerHTML = `
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span><strong>精準熱量控制：</strong>遵循「211 餐盤法」（2 份蔬菜、1 份優質蛋白、1 份原型澱粉）。</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span><strong>嚴格控糖與斷加工品：</strong>拒絕任何加糖飲料與精緻糕點，多飲用綠茶或黑咖啡輔助代謝。</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span><strong>拉長空腹時間：</strong>可嘗試 168 間歇性斷食法，給予身體胰島素充分休息與燃脂機會。</span></li>
+                        `;
+                    }
+
+                    // Exercise Advice (Obese)
+                    if (exerciseCardTitle) exerciseCardTitle.innerText = '低衝擊關節友善運動方案';
+                    if (exerciseContent) {
+                        exerciseContent.innerHTML = `
+                            <div class="p-3 bg-rose-50/60 rounded-xl">
+                                <div class="font-bold text-gray-800 text-xs flex items-center gap-1.5 mb-1"><i class="fa-solid fa-person-swimming text-rose-600"></i> 關節保護型運動（每週 3~5 次）</div>
+                                <p class="text-xs text-gray-600"><strong>強烈推薦：</strong>水中有氧、游泳、划船機與臥式健身車。利用水浮力減輕膝關節負擔。</p>
+                            </div>
+                            <div class="p-3 bg-emerald-50/60 rounded-xl">
+                                <div class="font-bold text-gray-800 text-xs flex items-center gap-1.5 mb-1"><i class="fa-solid fa-chair text-emerald-600"></i> 坐姿與穩定肌力訓練</div>
+                                <p class="text-xs text-gray-600">坐姿抬腿、彈力帶拉背、牆壁伏地挺身。避免高衝擊跳躍運動（如跳繩、開合跳），保護下肢關節。</p>
+                            </div>
+                        `;
+                    }
+                }
+
+                if (statusBadge) {
+                    statusBadge.className = `inline-block px-4 py-1.5 rounded-full text-sm font-bold text-white shadow-sm ${colorClass}`;
+                    statusBadge.innerText = category;
+                }
+                if (bmiMarker) {
+                    bmiMarker.style.left = `${markerPercent}%`;
+                }
+            }
+
+            // Global reset function
+            window.resetForm = function() {
+                if (heightInput) heightInput.value = 170;
+                if (heightRange) heightRange.value = 170;
+                if (heightValueDisplay) heightValueDisplay.innerHTML = '170 <span class="text-xs font-normal text-gray-500">公分</span>';
+
+                if (weightInput) weightInput.value = 65;
+                if (weightRange) weightRange.value = 65;
+                if (weightValueDisplay) weightValueDisplay.innerHTML = '65 <span class="text-xs font-normal text-gray-500">公斤</span>';
+
+                calculateBMI();
+            };
+
+            // Calculate initially
+            calculateBMI();
+        });
+    </script>
+</body>
+</html>
